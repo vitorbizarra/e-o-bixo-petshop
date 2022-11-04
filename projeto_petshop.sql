@@ -18,3 +18,5 @@ CREATE TABLE veterinario(
     Senha		VARCHAR(40) NOT NULL,
     Data_nasc	DATE NOT NULL
 );
+
+INSERT INTO `veterinario`(`Nome`, `Cpf`, `Senha`, `Data_nasc`) VALUES ('Admin', '111.111.111-11', '21232f297a57a5a743894a0e4a801fc3', '1999-01-01');

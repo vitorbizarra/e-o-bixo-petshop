@@ -24,7 +24,7 @@ public class UISplash extends javax.swing.JFrame {
             public void run() {
                 try {
                     // Valor padrao [i < 101]
-                    for (int i = 0; i < 101; i++) {
+                    for (int i = 0; i < 1; i++) {
                         Thread.sleep(60);
                         pgbLoader.setValue(i);
                     }

@@ -4,14 +4,20 @@
  */
 package views;
 
+import conexoes.MySQL;
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import objetos.Veterinario;
 
 /**
  *
  * @author aluno
  */
 public class UILogin extends javax.swing.JFrame {
+
+    MySQL conectar = new MySQL();
+    UISistema uiSistema = new UISistema();
 
     /**
      * Creates new form UILogin
@@ -28,7 +34,46 @@ public class UILogin extends javax.swing.JFrame {
         ImageIcon scaledIcon = new ImageIcon(imgScale);
         lblLogo.setIcon(scaledIcon);
     }
-    
+
+    public void BuscarVeterinario(Veterinario veterinario) {
+        // Dados para comparação
+        veterinario.setCpf(txtCpf.getText());
+        veterinario.setSenha(txtPass.getText());
+        String senhaBanco = "";
+
+        // Conecta ao banco
+        this.conectar.conectaBanco();
+        try {
+            //Realiza consulta no banco
+            this.conectar.executarSQL(
+                    "SELECT `Senha` "
+                    + "FROM `veterinario` "
+                    + "WHERE "
+                    + "Cpf = "
+                    + "'" + veterinario.getCpf() + "';");
+
+            // Loop para obter o resultado
+            while (this.conectar.getResultSet().next()) {
+                senhaBanco = this.conectar.getResultSet().getString(1);
+
+                // Confere se as senhas do usuário informado conferem
+                if (senhaBanco.equals(veterinario.getSenha())) {
+                    // Renderiza views
+                    uiSistema.setVisible(true);
+                    this.setVisible(false);
+                } else {
+                    System.out.println("Usuário não encontrado");
+                    JOptionPane.showMessageDialog(null, "Usuário não encontrado.");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao consultar usuário: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao consultar o usuário.");
+        } finally {
+            this.conectar.fechaBanco();
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -50,6 +95,7 @@ public class UILogin extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Login");
+        setResizable(false);
 
         jPanel2.setBackground(new java.awt.Color(51, 153, 255));
 
@@ -70,11 +116,6 @@ public class UILogin extends javax.swing.JFrame {
         jLabel2.setText("Senha");
 
         txtPass.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txtPass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPassActionPerformed(evt);
-            }
-        });
 
         btnEntrar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnEntrar.setText("Entrar");
@@ -174,22 +215,19 @@ public class UILogin extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPassActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPassActionPerformed
-
     private void btnShowPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowPassActionPerformed
-        if(btnShowPass.isSelected()){
+        if (btnShowPass.isSelected()) {
             btnShowPass.setText("🙉");
-            txtPass.setEchoChar((char)0);
-        }else{
+            txtPass.setEchoChar((char) 0);
+        } else {
             btnShowPass.setText("🙈");
             txtPass.setEchoChar('*');
         }
     }//GEN-LAST:event_btnShowPassActionPerformed
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
-        // TODO add your handling code here:
+        Veterinario veterinario = new Veterinario();
+        this.BuscarVeterinario(veterinario);
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     /**

@@ -62,8 +62,8 @@ public class UILogin extends javax.swing.JFrame {
                     uiSistema.setVisible(true);
                     this.setVisible(false);
                 } else {
-                    System.out.println("Usuário não encontrado");
-                    JOptionPane.showMessageDialog(null, "Usuário não encontrado.");
+                    System.out.println("CPF ou senha incorretos.");
+                    JOptionPane.showMessageDialog(null, "CPF ou senha incorretos.");
                 }
             }
         } catch (Exception e) {

@@ -1,20 +1,19 @@
+package objetos;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package objetos;
-
 /**
  *
  * @author aluno
  */
-public class Veterinario {
+public class Cliente {
 
     private String id;
     private String nome;
-    private String cpf;
-    private String senha;
-    private String data_nasc;
+    private String endereco;
+    private String animal;
 
     public String getId() {
         return id;
@@ -32,28 +31,20 @@ public class Veterinario {
         this.nome = nome;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getEndereco() {
+        return endereco;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
     }
 
-    public String getSenha() {
-        return senha;
+    public String getAnimal() {
+        return animal;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    public String getData_nasc() {
-        return data_nasc;
-    }
-
-    public void setData_nasc(String data_nasc) {
-        this.data_nasc = data_nasc;
+    public void setAnimal(String animal) {
+        this.animal = animal;
     }
 
 }

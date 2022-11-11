@@ -59,38 +59,39 @@ public class UISistema extends javax.swing.JFrame {
     }
 
     private void CadastrarVeterinario(Veterinario novoVeterinario) {
-        novoVeterinario.setNome(txtNomeCadastroVet.getText());
-        novoVeterinario.setCpf(txtCpfCadastroVet.getText());
         String pass = txtSenhaCadastroVet.getText();
         if (pass.equals(txtConfirmSenhaCadastroVet.getText())) {
+            novoVeterinario.setNome(txtNomeCadastroVet.getText());
+            novoVeterinario.setCpf(txtCpfCadastroVet.getText());
             novoVeterinario.setSenha(pass);
+
+            novoVeterinario.setCpf(txtCpfCadastroVet.getText());
+            novoVeterinario.setEmail(txtEmailCadastroVet.getText());
+
+            this.conn.conectaBanco();
+            try {
+                this.conn.insertSQL("INSERT INTO `veterinario` ("
+                        + "`Nome`, "
+                        + "`Cpf`, "
+                        + "`Senha`, "
+                        + "`Email`"
+                        + ") VALUES ("
+                        + "'" + novoVeterinario.getNome() + "', "
+                        + "'" + novoVeterinario.getCpf() + "', "
+                        + "'" + novoVeterinario.getSenha() + "', "
+                        + "'" + novoVeterinario.getEmail() + "'"
+                        + ")"
+                );
+            } catch (Exception e) {
+                System.out.println("Erro ao cadastrar veterinário: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "Erro ao cadastrar o veterinário.");
+            } finally {
+                this.conn.fechaBanco();
+                JOptionPane.showMessageDialog(null, "Veterinário cadastrado com sucesso.");
+                this.LimparCadastroVeterinario();
+            }
         } else {
             JOptionPane.showMessageDialog(null, "As senhas informadas não conferem");
-        }
-        novoVeterinario.setCpf(txtCpfCadastroVet.getText());
-        novoVeterinario.setEmail(txtEmailCadastroVet.getText());
-
-        this.conn.conectaBanco();
-        this.conn.insertSQL("INSERT INTO `veterinario` ("
-                + "`Nome`, "
-                + "`Cpf`, "
-                + "`Senha`, "
-                + "`Email`"
-                + ") VALUES ("
-                + "'" + novoVeterinario.getNome() + "', "
-                + "'" + novoVeterinario.getCpf() + "', "
-                + "'" + novoVeterinario.getSenha() + "', "
-                + "'" + novoVeterinario.getEmail() + "'"
-                + ")"
-        );
-        try {
-        } catch (Exception e) {
-            System.out.println("Erro ao cadastrar veterinário: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "Erro ao cadastrar o veterinário.");
-        } finally {
-            this.conn.fechaBanco();
-            JOptionPane.showMessageDialog(null, "Veterinário cadastrado com sucesso.");
-            this.LimparCadastroVeterinario();
         }
     }
 
@@ -753,10 +754,10 @@ public class UISistema extends javax.swing.JFrame {
     private void btnCadastrarVetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarVetActionPerformed
         Veterinario novoVeterinario = new Veterinario();
         if (!txtNomeCadastroVet.getText().equals("")
-            && !txtCpfCadastroVet.getText().equals("")
-            && !txtSenhaCadastroVet.getText().equals("")
-            && !txtConfirmSenhaCadastroVet.getText().equals("")
-            && !txtEmailCadastroVet.getText().equals("")) {
+                && !txtCpfCadastroVet.getText().equals("")
+                && !txtSenhaCadastroVet.getText().equals("")
+                && !txtConfirmSenhaCadastroVet.getText().equals("")
+                && !txtEmailCadastroVet.getText().equals("")) {
 
             this.CadastrarVeterinario(novoVeterinario);
         } else {

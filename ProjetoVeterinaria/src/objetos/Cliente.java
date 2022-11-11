@@ -11,9 +11,9 @@ package objetos;
 public class Cliente {
 
     private String id;
-    private String nome;
+    private String razao_social;
+    private String cnpj;
     private String endereco;
-    private String animal;
 
     public String getId() {
         return id;
@@ -23,12 +23,20 @@ public class Cliente {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getRazao_social() {
+        return razao_social;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setRazao_social(String razao_social) {
+        this.razao_social = razao_social;
+    }
+
+    public String getCnpj() {
+        return cnpj;
+    }
+
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
     }
 
     public String getEndereco() {
@@ -37,14 +45,6 @@ public class Cliente {
 
     public void setEndereco(String endereco) {
         this.endereco = endereco;
-    }
-
-    public String getAnimal() {
-        return animal;
-    }
-
-    public void setAnimal(String animal) {
-        this.animal = animal;
     }
 
 }

@@ -10,7 +10,7 @@ import views.UISplash;
  *
  * @author aluno
  */
-public class ProjetoPetshop {
+public class ProjetoVeterinaria {
 
     /**
      * @param args the command line arguments

@@ -14,7 +14,7 @@ public class Veterinario {
     private String nome;
     private String cpf;
     private String senha;
-    private String data_nasc;
+    private String email;
 
     public String getId() {
         return id;
@@ -48,12 +48,12 @@ public class Veterinario {
         this.senha = senha;
     }
 
-    public String getData_nasc() {
-        return data_nasc;
+    public String getEmail() {
+        return email;
     }
 
-    public void setData_nasc(String data_nasc) {
-        this.data_nasc = data_nasc;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }

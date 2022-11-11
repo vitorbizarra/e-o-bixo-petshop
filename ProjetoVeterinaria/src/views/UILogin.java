@@ -8,7 +8,7 @@ import conexoes.MySQL;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import objetos.Veterinario;
+import objetos.Usuario;
 
 /**
  *
@@ -35,11 +35,11 @@ public class UILogin extends javax.swing.JFrame {
         lblLogo.setIcon(scaledIcon);
     }
 
-    public void BuscarVeterinario(Veterinario veterinario) {
+    public void BuscarUsuario(Usuario usuario) {
         // Dados para comparação
-        veterinario.setCpf(txtCpf.getText());
-        veterinario.setSenha(txtPass.getText());
-        String senhaBanco = "";
+        usuario.setLogin(txtLogin.getText());
+        usuario.setSenha(txtPass.getText());
+        String senhaBanco;
 
         // Conecta ao banco
         this.conectar.conectaBanco();
@@ -47,23 +47,23 @@ public class UILogin extends javax.swing.JFrame {
             //Realiza consulta no banco
             this.conectar.executarSQL(
                     "SELECT `Senha` "
-                    + "FROM `veterinario` "
+                    + "FROM `usuario` "
                     + "WHERE "
-                    + "Cpf = "
-                    + "'" + veterinario.getCpf() + "';");
+                    + "Login = "
+                    + "'" + usuario.getLogin() + "';");
 
             // Loop para obter o resultado
             while (this.conectar.getResultSet().next()) {
                 senhaBanco = this.conectar.getResultSet().getString(1);
 
                 // Confere se as senhas do usuário informado conferem
-                if (senhaBanco.equals(veterinario.getSenha())) {
+                if (senhaBanco.equals(usuario.getSenha())) {
                     // Renderiza views
                     uiSistema.setVisible(true);
                     this.setVisible(false);
                 } else {
-                    System.out.println("CPF ou senha incorretos.");
-                    JOptionPane.showMessageDialog(null, "CPF ou senha incorretos.");
+                    System.out.println("Login ou senha incorretos.");
+                    JOptionPane.showMessageDialog(null, "Login ou senha incorretos.");
                 }
             }
         } catch (Exception e) {
@@ -86,31 +86,24 @@ public class UILogin extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        txtCpf = new javax.swing.JFormattedTextField();
         jLabel2 = new javax.swing.JLabel();
         txtPass = new javax.swing.JPasswordField();
         btnEntrar = new javax.swing.JButton();
         btnShowPass = new javax.swing.JToggleButton();
+        txtLogin = new javax.swing.JTextField();
         lblLogo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Login");
         setResizable(false);
 
-        jPanel2.setBackground(new java.awt.Color(51, 153, 255));
+        jPanel2.setBackground(new java.awt.Color(102, 255, 204));
 
-        jPanel1.setBackground(new java.awt.Color(51, 153, 255));
+        jPanel1.setBackground(new java.awt.Color(102, 255, 204));
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Login"));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel1.setText("CPF:");
-
-        try {
-            txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-        txtCpf.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel1.setText("Login:");
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("Senha");
@@ -133,28 +126,34 @@ public class UILogin extends javax.swing.JFrame {
             }
         });
 
+        txtLogin.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtCpf)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtPass)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnShowPass))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(107, 107, 107)
+                        .addComponent(btnEntrar)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtPass)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnShowPass)))
+                        .addContainerGap()
+                        .addComponent(txtLogin)))
                 .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(107, 107, 107)
-                .addComponent(btnEntrar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,7 +161,7 @@ public class UILogin extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -226,8 +225,8 @@ public class UILogin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnShowPassActionPerformed
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
-        Veterinario veterinario = new Veterinario();
-        this.BuscarVeterinario(veterinario);
+        Usuario usuario = new Usuario();
+        this.BuscarUsuario(usuario);
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     /**
@@ -273,7 +272,7 @@ public class UILogin extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblLogo;
-    private javax.swing.JFormattedTextField txtCpf;
+    private javax.swing.JTextField txtLogin;
     private javax.swing.JPasswordField txtPass;
     // End of variables declaration//GEN-END:variables
 }

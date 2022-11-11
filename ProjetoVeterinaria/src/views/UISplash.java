@@ -24,7 +24,7 @@ public class UISplash extends javax.swing.JFrame {
             public void run() {
                 try {
                     // Valor padrao [i < 101]
-                    for (int i = 0; i < 1; i++) {
+                    for (int i = 0; i < 101; i++) {
                         Thread.sleep(60);
                         pgbLoader.setValue(i);
                     }
@@ -63,7 +63,7 @@ public class UISplash extends javax.swing.JFrame {
         setResizable(false);
         setSize(new java.awt.Dimension(720, 480));
 
-        jPanel1.setBackground(new java.awt.Color(51, 153, 255));
+        jPanel1.setBackground(new java.awt.Color(102, 255, 204));
 
         lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
@@ -130,6 +130,9 @@ public class UISplash extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(UISplash.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */

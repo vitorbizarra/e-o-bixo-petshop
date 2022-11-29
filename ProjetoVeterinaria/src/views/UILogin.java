@@ -8,7 +8,7 @@ import conexoes.MySQL;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import objetos.Usuario;
+import objetos.Veterinario;
 
 /**
  *
@@ -35,10 +35,10 @@ public class UILogin extends javax.swing.JFrame {
         lblLogo.setIcon(scaledIcon);
     }
 
-    public void BuscarUsuario(Usuario usuario) {
+    public void BuscarUsuario(Veterinario veterinario) {
         // Dados para comparação
-        usuario.setLogin(txtLogin.getText());
-        usuario.setSenha(txtPass.getText());
+        veterinario.setEmail(txtLogin.getText());
+        veterinario.setSenha(txtPass.getText());
         String senhaBanco;
 
         // Conecta ao banco
@@ -47,17 +47,18 @@ public class UILogin extends javax.swing.JFrame {
             //Realiza consulta no banco
             this.conectar.executarSQL(
                     "SELECT `Senha` "
-                    + "FROM `usuario` "
+                    + "FROM `veterinario` "
                     + "WHERE "
-                    + "Login = "
-                    + "'" + usuario.getLogin() + "';");
+                    + "Email = "
+                    + "'" + veterinario.getEmail() + "';");
 
             // Loop para obter o resultado
             while (this.conectar.getResultSet().next()) {
-                senhaBanco = this.conectar.getResultSet().getString(1);
+                senhaBanco = this.conectar.getResultSet().getString("Senha");
 
                 // Confere se as senhas do usuário informado conferem
-                if (senhaBanco.equals(usuario.getSenha())) {
+                if (senhaBanco.equals(veterinario.getSenha())) {
+                    System.out.println("Logou");
                     // Renderiza views
                     uiSistema.setVisible(true);
                     this.setVisible(false);
@@ -225,8 +226,8 @@ public class UILogin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnShowPassActionPerformed
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
-        Usuario usuario = new Usuario();
-        this.BuscarUsuario(usuario);
+        Veterinario veterinario = new Veterinario();
+        this.BuscarUsuario(veterinario);
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     /**

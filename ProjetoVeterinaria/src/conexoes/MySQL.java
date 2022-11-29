@@ -69,7 +69,6 @@ public class MySQL {
             //Class.forName("com.mysql.jdbc.Driver").newInstance();
 
             conn = DriverManager.getConnection("jdbc:mysql://" + servidor + "/" + nomeDoBanco, usuario, senha);
-            //conn = DriverManager.getConnection("jdbc:mysql://localhost3306/banco_loja", "root", "root");
 
             if (conn != null) {
                 System.out.println("Conexão efetuada com sucesso! " + "ID: " + conn);

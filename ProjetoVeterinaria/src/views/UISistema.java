@@ -153,21 +153,23 @@ public class UISistema extends javax.swing.JFrame {
     private void UpdateCbxCliente() {
         cbxClienteBusca.removeAllItems();
         cbxClienteCadastroServico.removeAllItems();
+        cbxClientesVeterinario.removeAllItems();
 
+        this.conn.conectaBanco();
         try {
-            this.conn.conectaBanco();
 
             this.conn.executarSQL("SELECT Razao_social FROM cliente ORDER BY Razao_social");
 
             while (this.conn.getResultSet().next()) {
                 cbxClienteBusca.addItem(this.conn.getResultSet().getString("Razao_social"));
                 cbxClienteCadastroServico.addItem(this.conn.getResultSet().getString("Razao_social"));
+                cbxClientesVeterinario.addItem(this.conn.getResultSet().getString("Razao_social"));
             }
 
-            this.conn.fechaBanco();
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
+        this.conn.fechaBanco();
     }
 
     private void UpdateCbxVeterinario() {
@@ -175,21 +177,23 @@ public class UISistema extends javax.swing.JFrame {
         cbxVeterinarioCadastroServico.removeAllItems();
         cbxVeterinarioBuscaServico.removeAllItems();
 
+        this.conn.conectaBanco();
         try {
-            this.conn.conectaBanco();
 
             this.conn.executarSQL("SELECT Nome FROM veterinario ORDER BY Nome");
 
             while (this.conn.getResultSet().next()) {
-                cbxVeterinario.addItem(this.conn.getResultSet().getString("Nome"));
-                cbxVeterinarioCadastroServico.addItem(this.conn.getResultSet().getString("Nome"));
-                cbxVeterinarioBuscaServico.addItem(this.conn.getResultSet().getString("Nome"));
+                String new_item = this.conn.getResultSet().getString("Nome");
+//                System.out.println(new_item);
+                cbxVeterinario.addItem(new_item);
+                cbxVeterinarioCadastroServico.addItem(new_item);
+                cbxVeterinarioBuscaServico.addItem(new_item);
             }
 
-            this.conn.fechaBanco();
         } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            System.out.println("Erro UpdateCbxVeterinario: " + e.getMessage());
         }
+        this.conn.fechaBanco();
     }
 
     private void LimpaCadastroServico() {
@@ -206,8 +210,8 @@ public class UISistema extends javax.swing.JFrame {
         novoServico.setHoras(sldHorasCadastro.getValue());
         novoServico.setDescricao(txtDescCadastro.getText());
 
+        this.conn.conectaBanco();
         try {
-            this.conn.conectaBanco();
 
             this.conn.insertSQL("call insertServico("
                     + "'" + novoServico.getVeterinario() + "', "
@@ -222,6 +226,75 @@ public class UISistema extends javax.swing.JFrame {
         } finally {
             JOptionPane.showMessageDialog(null, "Serviço cadastrado com sucesso.");
             this.LimpaCadastroServico();
+        }
+    }
+
+    private void getServico() {
+        String nome_vet = String.valueOf(cbxVeterinarioBuscaServico.getSelectedItem());
+        String nome_cliente = String.valueOf(cbxClientesVeterinario.getSelectedItem());
+
+        this.conn.conectaBanco();
+        try {
+
+            this.conn.executarSQL("SELECT Cliente, Tipo, Horas, Descricao FROM ultimoServicoVeterinario WHERE Veterinario = '" + nome_vet + "' ORDER BY ID DESC LIMIT 1");
+            while (this.conn.getResultSet().next()) {
+                cbxClientesVeterinario.setSelectedItem(this.conn.getResultSet().getString("Cliente"));
+                txtTipoBusca.setText(this.conn.getResultSet().getString("Tipo"));
+                lblHorasBusca.setText(this.conn.getResultSet().getString("Horas"));
+                sldHorasBusca.setValue(Integer.parseInt(this.conn.getResultSet().getString("Horas")));
+                txtDescBusca.setText(this.conn.getResultSet().getString("Descricao"));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar clientes: " + e.getMessage());
+        }
+        this.conn.fechaBanco();
+    }
+
+    private void updateServico(Servico novoServico) {
+        novoServico.setVeterinario(String.valueOf(cbxVeterinarioBuscaServico.getSelectedItem()));
+        novoServico.setCliente(String.valueOf(cbxClientesVeterinario.getSelectedItem()));
+        novoServico.setTipo(txtTipoBusca.getText());
+        novoServico.setHoras(sldHorasBusca.getValue());
+        novoServico.setDescricao(txtDescBusca.getText());
+
+        this.conn.conectaBanco();
+
+        try {
+
+            this.conn.updateSQL("call updateServico("
+                    + "'" + novoServico.getVeterinario() + "', "
+                    + "'" + novoServico.getCliente() + "', "
+                    + "'" + novoServico.getTipo() + "', "
+                    + "'" + novoServico.getHoras() + "', "
+                    + "'" + novoServico.getDescricao() + "');");
+        } catch (Exception e) {
+            System.out.println("Erro ao atualizar cliente: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao atualizar o cliente.");
+        } finally {
+            this.conn.fechaBanco();
+            JOptionPane.showMessageDialog(null, "Servico atualizado com sucesso.");
+            this.LimparCadastroCliente();
+            UpdateCbxCliente();
+        }
+    }
+
+    private void deleteServico() {
+        String vet_name = String.valueOf(cbxVeterinarioBuscaServico.getSelectedItem());
+
+        try {
+            this.conn.conectaBanco();
+            this.conn.updateSQL("call deleteServico('" + vet_name + "')");
+            this.conn.fechaBanco();
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir o servico: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao excluir o servico.");
+        } finally {
+            JOptionPane.showMessageDialog(null, "Servico excluído com sucesso.");
+            txtTipoBusca.setText("");
+            lblHorasBusca.setText("0");
+            sldHorasBusca.setValue(0);
+            txtDescBusca.setText("");
         }
     }
 
@@ -313,18 +386,19 @@ public class UISistema extends javax.swing.JFrame {
         jLabel23 = new javax.swing.JLabel();
         cbxVeterinarioBuscaServico = new javax.swing.JComboBox<>();
         jLabel24 = new javax.swing.JLabel();
-        jComboBox4 = new javax.swing.JComboBox<>();
+        cbxClientesVeterinario = new javax.swing.JComboBox<>();
         jLabel25 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        txtTipoBusca = new javax.swing.JTextField();
         jLabel26 = new javax.swing.JLabel();
         sldHorasBusca = new javax.swing.JSlider();
         jLabel27 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        txtDescBusca = new javax.swing.JTextArea();
         lblHorasBusca = new javax.swing.JLabel();
         jPanel15 = new javax.swing.JPanel();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnUpdateServico = new javax.swing.JButton();
+        btnExcluirServico = new javax.swing.JButton();
+        btnBuscarServico = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("É o Bixo - Veterinária");
@@ -994,9 +1068,7 @@ public class UISistema extends javax.swing.JFrame {
                             .addComponent(jLabel19))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel12Layout.createSequentialGroup()
-                                .addComponent(jLabel18)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel18)
                             .addComponent(cbxClienteCadastroServico, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(jScrollPane3)
                     .addComponent(sldHorasCadastro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1042,12 +1114,12 @@ public class UISistema extends javax.swing.JFrame {
         jLabel24.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel24.setText("Cliente:");
 
-        jComboBox4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cbxClientesVeterinario.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
         jLabel25.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel25.setText("Tipo de serviço:");
 
-        jTextField2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtTipoBusca.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
         jLabel26.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel26.setText("Horas:");
@@ -1062,21 +1134,31 @@ public class UISistema extends javax.swing.JFrame {
         jLabel27.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel27.setText("Descrição:");
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane4.setViewportView(jTextArea2);
+        txtDescBusca.setColumns(20);
+        txtDescBusca.setRows(5);
+        jScrollPane4.setViewportView(txtDescBusca);
 
         lblHorasBusca.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblHorasBusca.setText("0");
 
         jPanel15.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jButton4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/atualizar.png"))); // NOI18N
+        btnUpdateServico.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnUpdateServico.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/atualizar.png"))); // NOI18N
+        btnUpdateServico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateServicoActionPerformed(evt);
+            }
+        });
 
-        jButton5.setBackground(new java.awt.Color(255, 0, 0));
-        jButton5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/deletar.png"))); // NOI18N
+        btnExcluirServico.setBackground(new java.awt.Color(255, 0, 0));
+        btnExcluirServico.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnExcluirServico.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/deletar.png"))); // NOI18N
+        btnExcluirServico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirServicoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
@@ -1085,19 +1167,27 @@ public class UISistema extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel15Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnExcluirServico, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
+                    .addComponent(btnUpdateServico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel15Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                .addComponent(btnUpdateServico, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnExcluirServico, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        btnBuscarServico.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnBuscarServico.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/buscar.png"))); // NOI18N
+        btnBuscarServico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarServicoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
@@ -1106,8 +1196,8 @@ public class UISistema extends javax.swing.JFrame {
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox4, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTextField2)
+                    .addComponent(cbxClientesVeterinario, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtTipoBusca)
                     .addComponent(sldHorasBusca, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel13Layout.createSequentialGroup()
                         .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1119,10 +1209,13 @@ public class UISistema extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblHorasBusca))
                             .addComponent(jLabel27)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(cbxVeterinarioBuscaServico, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel13Layout.createSequentialGroup()
+                        .addComponent(cbxVeterinarioBuscaServico, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBuscarServico)))
                 .addContainerGap())
         );
         jPanel13Layout.setVerticalGroup(
@@ -1130,15 +1223,17 @@ public class UISistema extends javax.swing.JFrame {
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addComponent(jLabel23)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxVeterinarioBuscaServico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbxVeterinarioBuscaServico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBuscarServico))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel24)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbxClientesVeterinario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtTipoBusca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel26)
@@ -1216,6 +1311,7 @@ public class UISistema extends javax.swing.JFrame {
                 && !txtEmailCadastroVet.getText().equals("")) {
 
             this.CadastrarVeterinario(novoVeterinario);
+            UpdateCbxVeterinario();
         } else {
             JOptionPane.showMessageDialog(null, "Preencha corretamente o formulário.", "Cadastro Veterinário", HEIGHT);
         }
@@ -1240,8 +1336,8 @@ public class UISistema extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLimparCadastroClActionPerformed
 
     private void btnBuscarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarClienteActionPerformed
+        this.conn.conectaBanco();
         try {
-            this.conn.conectaBanco();
 
             String client_name = String.valueOf(cbxClienteBusca.getSelectedItem());
 
@@ -1270,7 +1366,7 @@ public class UISistema extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeletarClienteActionPerformed
 
     private void cbxClienteBuscaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxClienteBuscaActionPerformed
-        System.out.println(cbxClienteBusca.getSelectedItem());
+        //System.out.println(cbxClienteBusca.getSelectedItem());
     }//GEN-LAST:event_cbxClienteBuscaActionPerformed
 
     private void sldHorasCadastroStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sldHorasCadastroStateChanged
@@ -1289,6 +1385,19 @@ public class UISistema extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         LimpaCadastroServico();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnUpdateServicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateServicoActionPerformed
+        Servico novoServico = new Servico();
+        updateServico(novoServico);
+    }//GEN-LAST:event_btnUpdateServicoActionPerformed
+
+    private void btnBuscarServicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarServicoActionPerformed
+        getServico();
+    }//GEN-LAST:event_btnBuscarServicoActionPerformed
+
+    private void btnExcluirServicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirServicoActionPerformed
+        deleteServico();
+    }//GEN-LAST:event_btnExcluirServicoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1336,25 +1445,26 @@ public class UISistema extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAtualizarCliente;
     private javax.swing.JButton btnBuscarCliente;
+    private javax.swing.JButton btnBuscarServico;
     private javax.swing.JButton btnCadastrarCl;
     private javax.swing.JButton btnCadastrarServico;
     private javax.swing.JButton btnCadastrarVet;
     private javax.swing.JButton btnDeletarCliente;
+    private javax.swing.JButton btnExcluirServico;
     private javax.swing.JButton btnLimparCadastroCl;
     private javax.swing.JButton btnLimparCadastroVet;
     private javax.swing.JToggleButton btnShowPass;
+    private javax.swing.JButton btnUpdateServico;
     private javax.swing.JComboBox<String> cbxClienteBusca;
     private javax.swing.JComboBox<String> cbxClienteCadastroServico;
+    private javax.swing.JComboBox<String> cbxClientesVeterinario;
     private javax.swing.JComboBox<String> cbxVeterinario;
     private javax.swing.JComboBox<String> cbxVeterinarioBuscaServico;
     private javax.swing.JComboBox<String> cbxVeterinarioCadastroServico;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
-    private javax.swing.JComboBox<String> jComboBox4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1402,8 +1512,6 @@ public class UISistema extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane3;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel lblHorasBusca;
     private javax.swing.JLabel lblHorasCadastro;
     private javax.swing.JSlider sldHorasBusca;
@@ -1413,6 +1521,7 @@ public class UISistema extends javax.swing.JFrame {
     private javax.swing.JPasswordField txtConfirmSenhaCadastroVet;
     private javax.swing.JFormattedTextField txtCpfCadastroVet;
     private javax.swing.JFormattedTextField txtCpfConsultaVet;
+    private javax.swing.JTextArea txtDescBusca;
     private javax.swing.JTextArea txtDescCadastro;
     private javax.swing.JTextField txtEmailCadastroVet;
     private javax.swing.JTextField txtEmailConsultaVet;
@@ -1424,6 +1533,7 @@ public class UISistema extends javax.swing.JFrame {
     private javax.swing.JTextField txtRazaoSocialCadastroCl;
     private javax.swing.JPasswordField txtSenhaCadastroVet;
     private javax.swing.JPasswordField txtSenhaConsultaVet;
+    private javax.swing.JTextField txtTipoBusca;
     private javax.swing.JTextField txtTipoCadastro;
     // End of variables declaration//GEN-END:variables
 }

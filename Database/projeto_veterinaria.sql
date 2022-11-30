@@ -1,7 +1,7 @@
 SET foreign_key_checks = 0;
 drop schema if exists `projeto_veterinaria`;
 CREATE DATABASE `projeto_veterinaria` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
-USE `mydb` ;
+USE `projeto_veterinaria` ;
 
 CREATE TABLE IF NOT EXISTS `projeto_veterinaria`.`cliente` (
   `ID` INT NOT NULL AUTO_INCREMENT,
@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS `projeto_veterinaria`.`veterinario` (
   UNIQUE INDEX `Cpf_UNIQUE` (`Cpf` ASC) VISIBLE,
   UNIQUE INDEX `Email_UNIQUE` (`Email` ASC) VISIBLE)
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -57,11 +56,6 @@ ENGINE = InnoDB;
 
 USE `projeto_veterinaria` ;
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 START TRANSACTION;
 USE `projeto_veterinaria`;
 INSERT INTO `projeto_veterinaria`.`veterinario` (`ID`, `Nome`, `Cpf`, `Senha`, `Email`) VALUES (DEFAULT, 'Admin', '111.111.111-11', 'admin', 'admin');
@@ -88,6 +82,47 @@ end$
 
 delimiter ;
 
+delimiter $
+
+create procedure updateServico(
+	nome_vet varchar(100),
+    nome_cli varchar(40),
+    tipo_serv varchar(45),
+    horas_serv int,
+    desc_serv mediumtext
+)
+begin
+	set @id_vet = (select ID from veterinario where Nome = nome_vet);
+    set @id_cli = (select ID from cliente where Razao_social = nome_cli);
+    set @last_serv_id = (select ID from servico WHERE Veterinario = @id_vet ORDER BY ID DESC LIMIT 1);
+    
+    update servico set Cliente = @id_cli, Tipo = tipo_serv, Horas = horas_serv, Descricao = desc_serv WHERE ID = @last_serv_id;
+end$
+
+delimiter ; 
+
+delimiter $
+
+create procedure deleteServico(
+	nome_vet varchar(100)
+)
+begin 
+	set @id_vet = (select ID from veterinario where Nome = nome_vet);
+    set @last_serv_id = (select ID from servico WHERE Veterinario = @id_vet ORDER BY ID DESC LIMIT 1);
+    
+    delete from servico where ID = @last_serv_id;
+end$
+
+delimiter ; 
+
+select * from servico;
+
+drop view if exists ultimoServicoVeterinario;
+create view ultimoServicoVeterinario as
+	select s.ID, c.Razao_social as 'Cliente', v.Nome as 'Veterinario', s.Tipo, s.Horas, s.Descricao from servico as s
+	join cliente as c on s.Cliente = c.ID join veterinario as v on s.Veterinario = v.ID;
+
+select * from ultimoServicoVeterinario WHERE Veterinario = 'Veterinario 1' ORDER BY ID DESC LIMIT 1;
 
 select * from servico;
 select * from cliente;

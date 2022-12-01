@@ -810,7 +810,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="cbxVeterinario" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jButton7" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnConsultarVet" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="txtCpfConsultaVet" alignment="0" max="32767" attributes="0"/>
                               <Component id="jPanel10" alignment="0" max="32767" attributes="0"/>
@@ -839,7 +839,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="cbxVeterinario" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButton7" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnConsultarVet" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
@@ -891,7 +891,7 @@
                     <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
                   </AuxValues>
                 </Component>
-                <Component class="javax.swing.JButton" name="jButton7">
+                <Component class="javax.swing.JButton" name="btnConsultarVet">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Segoe UI" size="14" style="0"/>
@@ -901,6 +901,9 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Buscar"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConsultarVetActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel14">
                   <Properties>
@@ -972,9 +975,9 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jButton8" min="-2" pref="150" max="-2" attributes="0"/>
+                              <Component id="btnUpdateVeterinario" min="-2" pref="150" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="jButton9" pref="152" max="32767" attributes="0"/>
+                              <Component id="btnDeletarVet" pref="152" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -984,8 +987,8 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jButton9" max="32767" attributes="0"/>
-                                  <Component id="jButton8" max="32767" attributes="0"/>
+                                  <Component id="btnDeletarVet" max="32767" attributes="0"/>
+                                  <Component id="btnUpdateVeterinario" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -993,7 +996,7 @@
                     </DimensionLayout>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jButton8">
+                    <Component class="javax.swing.JButton" name="btnUpdateVeterinario">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                           <Font name="Segoe UI" size="14" style="0"/>
@@ -1003,8 +1006,11 @@
                         </Property>
                         <Property name="text" type="java.lang.String" value="Atualizar"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnUpdateVeterinarioActionPerformed"/>
+                      </Events>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jButton9">
+                    <Component class="javax.swing.JButton" name="btnDeletarVet">
                       <Properties>
                         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="0" green="0" red="ff" type="rgb"/>
@@ -1017,6 +1023,9 @@
                         </Property>
                         <Property name="text" type="java.lang.String" value="Deletar"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDeletarVetActionPerformed"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>
@@ -1143,7 +1152,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel22" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane3" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" pref="137" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jPanel14" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -1356,7 +1365,6 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="cbxClientesVeterinario" max="32767" attributes="0"/>
                               <Component id="txtTipoBusca" alignment="0" max="32767" attributes="0"/>
                               <Component id="sldHorasBusca" alignment="0" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
@@ -1375,11 +1383,12 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jPanel15" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
+                              <Group type="102" alignment="1" attributes="0">
                                   <Component id="cbxVeterinarioBuscaServico" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btnBuscarServico" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnBuscarClientes" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <Component id="cbxClientesVeterinario" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -1392,7 +1401,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="cbxVeterinarioBuscaServico" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="btnBuscarServico" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnBuscarClientes" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="jLabel24" min="-2" max="-2" attributes="0"/>
@@ -1597,7 +1606,7 @@
                     </Component>
                   </SubComponents>
                 </Container>
-                <Component class="javax.swing.JButton" name="btnBuscarServico">
+                <Component class="javax.swing.JButton" name="btnBuscarClientes">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Segoe UI" size="14" style="0"/>
@@ -1607,7 +1616,7 @@
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBuscarServicoActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBuscarClientesActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

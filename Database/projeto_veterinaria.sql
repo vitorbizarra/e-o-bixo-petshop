@@ -115,15 +115,12 @@ end$
 
 delimiter ; 
 
-select * from servico;
-
 drop view if exists ultimoServicoVeterinario;
 create view ultimoServicoVeterinario as
 	select s.ID, c.Razao_social as 'Cliente', v.Nome as 'Veterinario', s.Tipo, s.Horas, s.Descricao from servico as s
 	join cliente as c on s.Cliente = c.ID join veterinario as v on s.Veterinario = v.ID;
 
-select * from ultimoServicoVeterinario WHERE Veterinario = 'Veterinario 1' ORDER BY ID DESC LIMIT 1;
-
-select * from servico;
-select * from cliente;
-select * from veterinario;
+-- select * from ultimoServicoVeterinario;
+-- select * from servico;
+-- select * from cliente;
+-- select * from veterinario;

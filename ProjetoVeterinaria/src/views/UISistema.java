@@ -231,7 +231,6 @@ public class UISistema extends javax.swing.JFrame {
 
     private void getServico() {
         String nome_vet = String.valueOf(cbxVeterinarioBuscaServico.getSelectedItem());
-        String nome_cliente = String.valueOf(cbxClientesVeterinario.getSelectedItem());
 
         this.conn.conectaBanco();
         try {
@@ -246,7 +245,7 @@ public class UISistema extends javax.swing.JFrame {
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao buscar clientes: " + e.getMessage());
+            System.out.println("Erro ao buscar servico: " + e.getMessage());
         }
         this.conn.fechaBanco();
     }
@@ -296,6 +295,88 @@ public class UISistema extends javax.swing.JFrame {
             sldHorasBusca.setValue(0);
             txtDescBusca.setText("");
         }
+    }
+
+    private void getVeterinario() {
+        String vet_name = String.valueOf(cbxVeterinario.getSelectedItem());
+
+        this.conn.conectaBanco();
+        try {
+            this.conn.executarSQL("SELECT Nome, Cpf, Email FROM veterinario WHERE Nome = '" + vet_name + "'");
+            while (this.conn.getResultSet().next()) {
+                txtNomeConsultaVet.setText(this.conn.getResultSet().getString("Nome"));
+                txtCpfConsultaVet.setText(this.conn.getResultSet().getString("Cpf"));
+                txtEmailConsultaVet.setText(this.conn.getResultSet().getString("Email"));
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao consultar veterinário: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao consultar veterinário.");
+        }
+
+        this.conn.fechaBanco();
+    }
+
+    private void updateVeterinario(Veterinario novoVeterinario) {
+
+        String vet_selected = String.valueOf(cbxVeterinario.getSelectedItem());
+
+        novoVeterinario.setNome(txtNomeConsultaVet.getText());
+        novoVeterinario.setCpf(txtCpfConsultaVet.getText());
+        novoVeterinario.setEmail(txtEmailConsultaVet.getText());
+        novoVeterinario.setSenha(txtSenhaConsultaVet.getText());
+
+        this.conn.conectaBanco();
+
+        try {
+
+            if ((novoVeterinario.getSenha()).equals("")) {
+                this.conn.updateSQL("UPDATE veterinario SET "
+                        + "Nome = '" + novoVeterinario.getNome() + "', "
+                        + "Cpf = '" + novoVeterinario.getCpf() + "', "
+                        + "Email = '" + novoVeterinario.getEmail() + "' "
+                        + "WHERE Nome = '" + vet_selected + "'");
+            } else {
+                this.conn.updateSQL("UPDATE veterinario SET "
+                        + "Nome = '" + novoVeterinario.getNome() + "', "
+                        + "Cpf = '" + novoVeterinario.getCpf() + "', "
+                        + "Email = '" + novoVeterinario.getEmail() + "', "
+                        + "Senha = '" + novoVeterinario.getSenha() + "' "
+                        + "WHERE Nome = '" + vet_selected + "'");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao atualizar veterinário: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao atualizar o veterinário.");
+        } finally {
+            this.conn.fechaBanco();
+            JOptionPane.showMessageDialog(null, "Veterinário atualizado com sucesso.");
+            UpdateCbxVeterinario();
+            txtNomeConsultaVet.setText("");
+            txtCpfConsultaVet.setText("");
+            txtEmailConsultaVet.setText("");
+            txtSenhaConsultaVet.setText("");
+        }
+
+        this.conn.fechaBanco();
+    }
+
+    private void deleteVeterinario() {
+        String vet_name = String.valueOf(cbxVeterinario.getSelectedItem());
+
+        this.conn.conectaBanco();
+        try {
+            this.conn.updateSQL("DELETE FROM veterinario WHERE Nome = '" + vet_name + "'");
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir o veterinário: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao excluir o veterinário.");
+        } finally {
+            JOptionPane.showMessageDialog(null, "Veterinario excluído com sucesso.");
+            UpdateCbxVeterinario();
+            txtNomeConsultaVet.setText("");
+            txtCpfConsultaVet.setText("");
+            txtEmailConsultaVet.setText("");
+            txtSenhaConsultaVet.setText("");
+        }
+        this.conn.fechaBanco();
     }
 
     /**
@@ -353,7 +434,7 @@ public class UISistema extends javax.swing.JFrame {
         jPanel5 = new javax.swing.JPanel();
         jLabel13 = new javax.swing.JLabel();
         cbxVeterinario = new javax.swing.JComboBox<>();
-        jButton7 = new javax.swing.JButton();
+        btnConsultarVet = new javax.swing.JButton();
         jLabel14 = new javax.swing.JLabel();
         txtNomeConsultaVet = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
@@ -362,8 +443,8 @@ public class UISistema extends javax.swing.JFrame {
         txtSenhaConsultaVet = new javax.swing.JPasswordField();
         jLabel17 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
-        jButton8 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
+        btnUpdateVeterinario = new javax.swing.JButton();
+        btnDeletarVet = new javax.swing.JButton();
         txtEmailConsultaVet = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
@@ -398,7 +479,7 @@ public class UISistema extends javax.swing.JFrame {
         jPanel15 = new javax.swing.JPanel();
         btnUpdateServico = new javax.swing.JButton();
         btnExcluirServico = new javax.swing.JButton();
-        btnBuscarServico = new javax.swing.JButton();
+        btnBuscarClientes = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("É o Bixo - Veterinária");
@@ -822,9 +903,14 @@ public class UISistema extends javax.swing.JFrame {
         cbxVeterinario.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         cbxVeterinario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jButton7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/buscar.png"))); // NOI18N
-        jButton7.setText("Buscar");
+        btnConsultarVet.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnConsultarVet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/buscar.png"))); // NOI18N
+        btnConsultarVet.setText("Buscar");
+        btnConsultarVet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultarVetActionPerformed(evt);
+            }
+        });
 
         jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel14.setText("Nome:");
@@ -851,14 +937,24 @@ public class UISistema extends javax.swing.JFrame {
 
         jPanel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jButton8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/atualizar.png"))); // NOI18N
-        jButton8.setText("Atualizar");
+        btnUpdateVeterinario.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnUpdateVeterinario.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/atualizar.png"))); // NOI18N
+        btnUpdateVeterinario.setText("Atualizar");
+        btnUpdateVeterinario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateVeterinarioActionPerformed(evt);
+            }
+        });
 
-        jButton9.setBackground(new java.awt.Color(255, 0, 0));
-        jButton9.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/deletar.png"))); // NOI18N
-        jButton9.setText("Deletar");
+        btnDeletarVet.setBackground(new java.awt.Color(255, 0, 0));
+        btnDeletarVet.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnDeletarVet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/deletar.png"))); // NOI18N
+        btnDeletarVet.setText("Deletar");
+        btnDeletarVet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeletarVetActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
@@ -866,9 +962,9 @@ public class UISistema extends javax.swing.JFrame {
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel10Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnUpdateVeterinario, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+                .addComponent(btnDeletarVet, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel10Layout.setVerticalGroup(
@@ -876,8 +972,8 @@ public class UISistema extends javax.swing.JFrame {
             .addGroup(jPanel10Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnDeletarVet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnUpdateVeterinario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -894,7 +990,7 @@ public class UISistema extends javax.swing.JFrame {
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(cbxVeterinario, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton7))
+                        .addComponent(btnConsultarVet))
                     .addComponent(txtCpfConsultaVet)
                     .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtEmailConsultaVet)
@@ -917,7 +1013,7 @@ public class UISistema extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbxVeterinario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton7))
+                    .addComponent(btnConsultarVet))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel14)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1097,7 +1193,7 @@ public class UISistema extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel22)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1181,11 +1277,11 @@ public class UISistema extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        btnBuscarServico.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        btnBuscarServico.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/buscar.png"))); // NOI18N
-        btnBuscarServico.addActionListener(new java.awt.event.ActionListener() {
+        btnBuscarClientes.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnBuscarClientes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icones/buscar.png"))); // NOI18N
+        btnBuscarClientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuscarServicoActionPerformed(evt);
+                btnBuscarClientesActionPerformed(evt);
             }
         });
 
@@ -1196,7 +1292,6 @@ public class UISistema extends javax.swing.JFrame {
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbxClientesVeterinario, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtTipoBusca)
                     .addComponent(sldHorasBusca, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel13Layout.createSequentialGroup()
@@ -1212,10 +1307,11 @@ public class UISistema extends javax.swing.JFrame {
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel13Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
                         .addComponent(cbxVeterinarioBuscaServico, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBuscarServico)))
+                        .addComponent(btnBuscarClientes))
+                    .addComponent(cbxClientesVeterinario, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel13Layout.setVerticalGroup(
@@ -1225,7 +1321,7 @@ public class UISistema extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbxVeterinarioBuscaServico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBuscarServico))
+                    .addComponent(btnBuscarClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel24)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1391,13 +1487,27 @@ public class UISistema extends javax.swing.JFrame {
         updateServico(novoServico);
     }//GEN-LAST:event_btnUpdateServicoActionPerformed
 
-    private void btnBuscarServicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarServicoActionPerformed
+    private void btnBuscarClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarClientesActionPerformed
         getServico();
-    }//GEN-LAST:event_btnBuscarServicoActionPerformed
+    }//GEN-LAST:event_btnBuscarClientesActionPerformed
 
     private void btnExcluirServicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirServicoActionPerformed
         deleteServico();
     }//GEN-LAST:event_btnExcluirServicoActionPerformed
+
+    private void btnConsultarVetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarVetActionPerformed
+        getVeterinario();
+    }//GEN-LAST:event_btnConsultarVetActionPerformed
+
+    private void btnUpdateVeterinarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateVeterinarioActionPerformed
+        Veterinario novoVeterinario = new Veterinario();
+        updateVeterinario(novoVeterinario);
+    }//GEN-LAST:event_btnUpdateVeterinarioActionPerformed
+
+    private void btnDeletarVetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeletarVetActionPerformed
+        deleteVeterinario();
+        UpdateCbxVeterinario();
+    }//GEN-LAST:event_btnDeletarVetActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1445,16 +1555,19 @@ public class UISistema extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAtualizarCliente;
     private javax.swing.JButton btnBuscarCliente;
-    private javax.swing.JButton btnBuscarServico;
+    private javax.swing.JButton btnBuscarClientes;
     private javax.swing.JButton btnCadastrarCl;
     private javax.swing.JButton btnCadastrarServico;
     private javax.swing.JButton btnCadastrarVet;
+    private javax.swing.JButton btnConsultarVet;
     private javax.swing.JButton btnDeletarCliente;
+    private javax.swing.JButton btnDeletarVet;
     private javax.swing.JButton btnExcluirServico;
     private javax.swing.JButton btnLimparCadastroCl;
     private javax.swing.JButton btnLimparCadastroVet;
     private javax.swing.JToggleButton btnShowPass;
     private javax.swing.JButton btnUpdateServico;
+    private javax.swing.JButton btnUpdateVeterinario;
     private javax.swing.JComboBox<String> cbxClienteBusca;
     private javax.swing.JComboBox<String> cbxClienteCadastroServico;
     private javax.swing.JComboBox<String> cbxClientesVeterinario;
@@ -1462,9 +1575,6 @@ public class UISistema extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbxVeterinarioBuscaServico;
     private javax.swing.JComboBox<String> cbxVeterinarioCadastroServico;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
